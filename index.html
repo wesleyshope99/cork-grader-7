@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+<title>Cork Grader 7</title>
+<meta name="theme-color" content="#141416" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Cork Grader 7" />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<header class="app-header">
+  <h1>Cork Grader 7</h1>
+  <div id="storage-banner" class="storage-banner" hidden></div>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="grade">Grade</button>
+  <button class="tab-btn" data-tab="log">Log</button>
+</nav>
+
+<main>
+
+  <!-- ===================== GRADE TAB ===================== -->
+  <section id="tab-grade" class="tab-panel active">
+
+    <!-- Settings: kept outside the calibrate and grading screens so they stay
+         reachable whenever the Grade tab isn't in the middle of calibrating. -->
+    <div id="settings-row">
+      <div class="row">
+        <label class="muted">Sharpening
+          <select id="sharpen-mode">
+            <option value="off">Off</option>
+            <option value="light">Light</option>
+            <option value="medium">Medium</option>
+          </select>
+        </label>
+        <label class="muted">Discoloration counts toward porosity
+          <select id="weighted-mode">
+            <option value="off">Off</option>
+            <option value="on">On (40%)</option>
+          </select>
+        </label>
+      </div>
+      <p id="video-info" class="muted small">video: —</p>
+    </div>
+
+    <div id="grade-calibrate-prompt" class="panel-message" hidden>
+      <p id="grade-calibrate-prompt-text">Camera not calibrated yet.</p>
+      <button id="btn-start-calibration" class="btn-primary">Calibrate camera position</button>
+    </div>
+
+    <!-- Calibration flow -->
+    <div id="calibration-screen" hidden>
+      <p class="hint">Place a disk in the fixture. Drag to move the circle, pinch or scroll to resize it, until it exactly outlines the disk.</p>
+      <div class="video-wrap">
+        <video id="calib-video" playsinline autoplay muted></video>
+        <canvas id="calib-overlay"></canvas>
+      </div>
+      <div class="row">
+        <span class="muted">Preview:</span>
+        <canvas id="calib-preview" width="300" height="300" class="preview-canvas small"></canvas>
+      </div>
+      <div class="row">
+        <button id="btn-confirm-calibration" class="btn-primary">Confirm calibration</button>
+        <button id="btn-cancel-calibration" class="btn-secondary">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Live grading flow -->
+    <div id="grading-screen" hidden>
+      <div class="row spread">
+        <label class="muted">Disk diameter (mm) — required
+          <input id="session-diameter" type="number" inputmode="decimal" placeholder="e.g. 32" required />
+        </label>
+        <button id="btn-recalibrate" class="btn-link">Recalibrate</button>
+      </div>
+
+      <div class="video-wrap">
+        <video id="grade-video" playsinline autoplay muted></video>
+        <canvas id="grade-overlay"></canvas>
+        <div id="grade-result-overlay" class="result-overlay" hidden>
+          <span id="grade-result-letter" class="grade-letter"></span>
+          <span id="grade-result-metrics" class="grade-metrics"></span>
+        </div>
+      </div>
+
+      <p id="grade-error" class="error-text" hidden></p>
+      <p id="grade-status" class="hint">Enter the disk diameter, line the disk up in the circle, then tap to grade.</p>
+
+      <div class="row">
+        <button id="btn-manual-grade" class="btn-primary btn-large">Tap to grade</button>
+      </div>
+
+      <p class="muted small">Last graded: <span id="last-graded">—</span></p>
+
+      <div class="row">
+        <canvas id="grade-crop-preview" width="120" height="120" class="preview-canvas small"></canvas>
+        <div>
+          <p class="muted small">Last capture, with the detected disc boundary</p>
+          <button id="btn-undo-last-grade" class="btn-link small" disabled>Undo last grade</button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ===================== LOG TAB ===================== -->
+  <section id="tab-log" class="tab-panel">
+    <div class="row spread">
+      <select id="log-date-select"></select>
+      <span id="log-count" class="muted"></span>
+    </div>
+
+    <table id="log-table" class="log-table">
+      <thead><tr><th>Time</th><th>Grade</th><th>Porosity</th><th>Top-3 mm</th><th>Diameter</th></tr></thead>
+      <tbody id="log-table-body"></tbody>
+    </table>
+
+    <div class="row">
+      <button id="btn-export-day" class="btn-primary">Export this day (.xlsx)</button>
+      <button id="btn-export-all" class="btn-secondary">Export all (.xlsx)</button>
+    </div>
+    <div class="row">
+      <button id="btn-view-text" class="btn-link">View as text instead</button>
+    </div>
+    <p id="export-status" class="muted small"></p>
+
+    <div id="text-export-modal" class="modal" hidden>
+      <div class="modal-inner">
+        <p class="hint">Tap inside, select all, and copy.</p>
+        <textarea id="text-export-area" readonly rows="14"></textarea>
+        <button id="btn-close-text-export" class="btn-secondary">Close</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script src="vendor/xlsx.full.min.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
